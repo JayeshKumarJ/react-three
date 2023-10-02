@@ -10,9 +10,9 @@ const Scene = () => {
   const { scene } = useThree();
 
   console.log("Mode", mode);
-  console.log("selectedComp", selectedComponent);
+  console.log("selectedComp", selectedComponent?.uuid);
   console.log("scene----", scene);
-  console.log("getObject", scene?.getObjectById(selectedComponent));
+  console.log("getObject", scene?.getObjectById(selectedComponent?.id));
 
   return (
     <>
@@ -22,7 +22,11 @@ const Scene = () => {
       <OrbitControls makeDefault />
       <TransformControls
         mode={mode}
-        object={scene?.getObjectById(selectedComponent)}
+        object={scene?.getObjectById(selectedComponent?.id)}
+        showX={selectedComponent ? true :false}
+        showY={selectedComponent ? true :false}
+        showZ={selectedComponent ? true :false}
+        position={[selectedComponent?.position]}
       ></TransformControls>
     </>
   );
