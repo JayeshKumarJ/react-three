@@ -27,30 +27,25 @@ export const editorSlice = createSlice({
       state.data.push(obj);
     },
     setMode: (state, action) => {
-      {
-        state.mode = action.payload.mode;
-      }
+      state.mode = action.payload;
     },
     setSelectedComponent: (state, action) => {
-      console.log("id", action.payload);
       state.selectedComponent = action.payload;
     },
 
     removeComponent: (state, action) => {
-      console.log("selected in slice",action)
-      const i = state.data.findIndex((item) => item.id === action.payload);
-      console.log("index",i)
-      if(i!=-1){
-        state.data.splice(i,1);
+      const i = state.data.findIndex((item) => item.id === action.payload.id);
+      console.log("index", i);
+      if (i !== -1) {
+        state.data.splice(i, 1);
       }
-      if(i==0){
-        state.selectedComponent = undefined
+      if (i === 0) {
+        state.selectedComponent = undefined;
       }
-    
     },
   },
 });
 
-export const { addComponent, setMode, setSelectedComponent,removeComponent } =
+export const { addComponent, setMode, setSelectedComponent, removeComponent } =
   editorSlice.actions;
 export default editorSlice.reducer;
