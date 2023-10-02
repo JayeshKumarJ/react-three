@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { setSelectedComponent } from "../Redux/editor.slice";
+import { setMode, setSelectedComponent } from "../Redux/editor.slice";
 import { useThree } from "@react-three/fiber";
 import { GLTFExporter } from "three/addons/exporters/GLTFExporter.js";
 import { useEffect } from "react";
@@ -68,6 +68,8 @@ export default function Component() {
                   position={component?.position}
                   onClick={(e) => {
                     console.log("event", e);
+                    dispatch(setMode("translate"))
+
                     dispatch(setSelectedComponent(e.eventObject));
                     // dispatch(setSelectedComponent(component));
 
