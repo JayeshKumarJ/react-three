@@ -13,7 +13,7 @@ function Sidebar() {
 
   const dispatch = useDispatch();
   const selectedComponents = useSelector((state) => state.selectedComponent);
-
+const mode = useSelector((state) => state.mode);
   // const scene = useThree((state)=>state.scene)
   // const exporter = new GLTFExporter();
 
@@ -130,7 +130,7 @@ function Sidebar() {
         />
       ) : null}
       {selectedComponents ? (
-        <select value={selectedValue} onChange={handleSelectChange}>
+        <select value={mode} onChange={handleSelectChange}>
           <option value="translate">Translate</option>
           <option value="scale">Scale</option>
           <option value="rotate">Rotate</option>
