@@ -1,0 +1,37 @@
+/* Sidebar Styles */
+.sidebar {
+  width: 250px; /* Set the width of the sidebar */
+  height: 100%; /* Make the sidebar take the full height of the parent container */
+  background-color: #333; /* Background color for the sidebar */
+  color: #fff; /* Text color */
+  position: fixed; /* Fixed position to keep it in place */
+  top: 0;
+  left: 0;
+  overflow-x: hidden; /* Hide horizontal scrollbar if content overflows */
+  padding-top: 20px; /* Add padding at the top */
+}
+
+.sidebar ul {
+  list-style: none; /* Remove default list styles */
+  padding: 0;
+}
+
+.sidebar ul li {
+  padding: 10px;
+}
+
+/* Styling for links */
+.sidebar ul li:hover {
+  background-color: #555; /* Change background color on hover */
+}
+
+/* Content Styles (main area) */
+.content {
+  margin-left: 250px; /* Set the left margin to match the sidebar width */
+  padding: 20px;
+}
+
+/* Example styles for content */
+.content h1 {
+  color: #333;
+}
