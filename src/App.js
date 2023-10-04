@@ -17,7 +17,7 @@ import { useRef } from "react";
 
 function App() {
   const created = ({ gl }) => {
-    gl.setClearColor("#ff0000", 1);
+    // gl.setClearColor("#ff0000", 1);
   };
 
   const ref = useRef(null);
@@ -26,6 +26,8 @@ function App() {
     // This won't work because the DOM node isn't exposed:
     // ref.current.style.opacity = 0.5;
   }
+
+  console.log("App")
 
   return (
     <div
@@ -41,10 +43,11 @@ function App() {
         }}
         onCreated={created}
       >
+      {/* <color args={ [ 'ivory' ] } attach="background" />   */}
         <Scene ref={ref} />
       </Canvas>
       <Sidebar handleClick={handleClick} />
-    </div>
+        </div>
   );
 }
 

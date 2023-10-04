@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { setMode, setSelectedComponent } from "../Redux/editor.slice";
+import { editText, setMode, setSelectedComponent } from "../Redux/editor.slice";
 import { useThree } from "@react-three/fiber";
 import { GLTFExporter } from "three/addons/exporters/GLTFExporter.js";
 import {
@@ -8,8 +8,9 @@ import {
   useImperativeHandle,
   forwardRef,
   Component,
+  useState,
 } from "react";
-import { Text3D } from "@react-three/drei";
+import { Html, Text, Text3D } from "@react-three/drei";
 import {
   EffectComposer,
   Outline,
@@ -21,17 +22,24 @@ import Drunk from "./Drunk.js";
 import { useControls } from "leva";
 import { BlendFunction } from "postprocessing";
 import { Physics, RigidBody } from "@react-three/rapier";
+import { Perf } from 'r3f-perf'
 // import { GLTFExporter } from 'three/addons/loaders/GLTFExporter';
 
 const Meshes = forwardRef(function Component(props, ref) {
+  const [text, setText] = useState();
+  const [isEdit, setIsEdit] = useState(false);
+  const [prevText, setPrevText] = useState("");
   const dispatch = useDispatch();
   const components = useSelector((state) => state);
   const scene = useThree((state) => state.scene);
   const drunkRef = useRef();
   console.log("box", components?.data);
-  console.log("selected", components?.selectedComponent?.uuid);
+  console.log(
+    "selected",
+    components?.selectedComponent?.sceneObj?.geometry?.uuid
+  );
   console.log("Scene =>", scene);
-
+  console.log("prevText", prevText);
   useImperativeHandle(
     ref,
     () => {
@@ -81,22 +89,118 @@ const Meshes = forwardRef(function Component(props, ref) {
     frequency: { value: 2, min: 1, max: 20 },
     amplitude: { value: 0.1, min: 0, max: 1 },
   });
+  
+  const { perfVisible } = useControls({
+    perfVisible: true
+})
+const { envMapIntensity } = useControls('environment map', {
+  envMapIntensity: { value: 1, min: 0, max: 12 }
+})
+  const handleChange = (event) => {
+    // 👇 Get input value from "event"
+    setText(event.target.value);
+    setPrevText(event.target.value);
+  };
+  console.log("text", text);
   return components?.data?.map((component) => {
     console.log("component", component);
     console.log("type:::", component?.type === "plane" ? "fixed" : "dynamic");
+    console.log(
+      "condition",
+      components?.selectedComponent?.sceneObj?.uuid === component?.id
+    );
     return (
       <>
+      {perfVisible && <Perf position="bottom-right"/>}
         {component?.type === "text" ? (
-          <mesh
-            onClick={() => {
-              dispatch(setSelectedComponent(component));
-            }}
-          >
-            <Text3D font={`./${component?.font}`}>
-              {component?.text}
-              <meshNormalMaterial />
-            </Text3D>
-          </mesh>
+          <Selection>
+            <EffectComposer multisampling={8} autoClear={false}>
+              <Outline
+                blur
+                visibleEdgeColor="yellow"
+                edgeStrength={100}
+                width={2500}
+              />
+            </EffectComposer>
+            <Select
+              enabled={
+                components?.selectedComponent?.sceneObj?.uuid === component.id
+              }
+            >
+              {components?.selectedComponent?.sceneObj?.uuid ===
+              component.id ? (
+                <Html
+                  // position={[-4.7, 2.9, 0]}
+                  position={component.position}
+                >
+                  {isEdit ? (
+                    <>
+                      <input
+                        type="text"
+                        placeholder="Edit Text here"
+                        id="text"
+                        name="text"
+                        value={prevText}
+                        onChange={handleChange}
+                      ></input>
+                      <button
+                        position={[0, 5, 0]}
+                        onClick={() => {
+                          dispatch(editText({ text: text, id: component.id }));
+                          setIsEdit(false);
+                        }}
+                      >
+                        Update
+                      </button>
+                      <button
+                        position={[0, 5, 0]}
+                        onClick={() => {
+                          setIsEdit(false);
+                        }}
+                      >
+                        Cancel
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      position={[0, 5, 0]}
+                      onClick={() => {
+                        setIsEdit(true);
+                        setPrevText(component.text);
+                      }}
+                    >
+                      Edit
+                    </button>
+                  )}
+                </Html>
+              ) : null}
+
+              <mesh
+                onClick={(e) => {
+                  dispatch(
+                    setSelectedComponent({
+                      sceneObj: e.eventObject,
+                      addedObj: component,
+                    })
+                  );
+                }}
+              >
+                <Text3D font={`./${component?.font}`}>
+                  {component?.text}
+                  <meshNormalMaterial />
+                </Text3D>
+
+                {/* <Text
+                  scale={[10, 10, 10]}
+                  color="pink" // default
+                  anchorX="center" // default
+                  anchorY="middle" // default
+                >
+                  HELLO WORLD
+                </Text> */}
+              </mesh>
+            </Select>
+          </Selection>
         ) : (
           <Physics gravity={[0, -9.08, 0]}>
             <Selection>
@@ -114,10 +218,12 @@ const Meshes = forwardRef(function Component(props, ref) {
                   /> */}
                 {/* <Vignette/> */}
               </EffectComposer>
-              {/* <Select
-                enabled={components.selectedComponent?.uuid === component.id}
-              > */}
-                <Select enabled={components?.selectedComponent?.id === component?.id}>
+              <Select
+                enabled={
+                  components?.selectedComponent?.sceneObj?.uuid === component.id
+                }
+              >
+                {/* <Select enabled={components?.selectedComponent?.id === component?.id}> */}
 
                 <RigidBody
                   type={component?.type === "plane" ? "fixed" : "fixed"}
@@ -126,24 +232,25 @@ const Meshes = forwardRef(function Component(props, ref) {
                   // restitution={component?.type === "plane" ? 0 : null}
                   // friction={component?.type === "plane" ? 0.7 : null}
                 >
-                  <mesh
+                  <mesh 
                     position={component?.position}
                     rotation={component?.rotation}
                     onClick={(e) => {
                       console.log("event", e);
                       dispatch(setMode("translate"));
-                      // dispatch(setSelectedComponent(e.eventObject));
-                      // type= {component}
-
-                      dispatch(setSelectedComponent(component));
+                      dispatch(
+                        setSelectedComponent({
+                          sceneObj: e.eventObject,
+                          addedObj: component,
+                        })
+                      );
                     }}
                   >
                     <component.geometry
                       args={component?.scale}
-                      // font={`./${component?.font}`}
                     />
-                    {/* {component?.text} */}
                     <component.material
+                    envMapIntensity={ envMapIntensity }
                       color={`${component?.color}`}
                       toneMapped={false}
                     />

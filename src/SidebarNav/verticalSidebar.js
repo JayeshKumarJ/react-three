@@ -3,6 +3,7 @@ import "./Sidebar.css";
 import { useDispatch, useSelector } from "react-redux";
 import {
   addComponent,
+  addModel,
   removeComponent,
   setMode,
   updateColor,
@@ -60,6 +61,7 @@ function Sidebar({ handleClick }) {
     text: "Hello",
     type: "text",
   };
+  
   const pickerStyle = {
     default: {
       picker: {
@@ -79,6 +81,11 @@ function Sidebar({ handleClick }) {
     type: "plane",
     rotation: [-Math.PI / 2, 0, 1],
   };
+
+  const modal = {
+    url:"./cover_chair.glb",
+    scale:0.5
+  }
   const handleSelectChange = (event) => {
     setSelectedValue(event.target.value);
     dispatch(setMode(event?.target?.value));
@@ -124,9 +131,17 @@ function Sidebar({ handleClick }) {
         >
           Text
         </li>
+
+        <li
+          onClick={() => {
+            dispatch(addModel(modal));
+          }}
+        >
+          Model
+        </li>
         {selectedComponents === undefined ? null : (
           <button
-            onClick={() => {
+            onClick={(e) => {
               dispatch(removeComponent(selectedComponents));
             }}
           >
@@ -144,7 +159,7 @@ function Sidebar({ handleClick }) {
           </select>
         </>
       ) : null}
-      {selectedComponents?.children?.length >= 0 ? (
+      {selectedComponents ? (
         <>
           <br />
           <button onClick={handleClick}>Export Scene</button>
@@ -167,7 +182,7 @@ function Sidebar({ handleClick }) {
             dispatch(
               updateColor({
                 color: updatedColor.hex,
-                selectedComponents: selectedComponents,
+                selectedComponents: selectedComponents.addedObj,
               })
             );
           }}

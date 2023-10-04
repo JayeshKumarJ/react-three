@@ -8,10 +8,11 @@ export const editorSlice = createSlice({
     mode: "translate",
     selectedComponent: undefined,
     color: "red",
+    modelData: [],
   },
   reducers: {
     addComponent: (state, action) => {
-      console.log("action", action);
+      // console.log("action", action);
 
       const obj = {
         id: uuidv4(),
@@ -29,16 +30,28 @@ export const editorSlice = createSlice({
       state.data.push(obj);
     },
     setMode: (state, action) => {
+      console.log("action in set mode", action);
       state.mode = action.payload;
     },
     setSelectedComponent: (state, action) => {
+      console.log("action obj", action.payload);
+      // console.log("idididid",action.payload.sceneObj.geometry.uuid )
       state.selectedComponent = action.payload;
+      const updatedData = state.data.map((item) => {
+        if (item.id === action.payload.addedObj.id) {
+          return { ...item, id: action.payload.sceneObj.uuid };
+        }
+        return item;
+      });
+      state.data = updatedData;
     },
 
     removeComponent: (state, action) => {
       console.log("action", action);
-      const i = state.data.findIndex((item) => item.id === action.payload.id);
-      console.log("index", i);
+      const i = state.data.findIndex(
+        (item) => item.id === action.payload.addedObj?.id
+      );
+      // console.log("index", i);
       if (i !== -1) {
         state.data.splice(i, 1);
       }
@@ -47,23 +60,35 @@ export const editorSlice = createSlice({
       }
     },
     updateColor: (state, action) => {
-      console.log("update color action", action);
+      // console.log("update color action", action);
       // function updateColorById(idToUpdate, newColor) {
       const updatedData = state.data.map((item) => {
-        // Check if the current object's id matches the id to update
-        console.log("item in update",item)
-        if (item.id === action.payload.selectedComponents?.id) {
-          // Create a new object with the updated color
+        if (item.id === action.payload.selectedComponents.id) {
           return { ...item, color: action.payload.color };
         }
-        // If the id doesn't match, return the original object
         return item;
       });
-
       state.data = updatedData;
+    },
+    editText: (state, action) => {
+      console.log("editText", action);
 
-      // return updatedData;
-      // }
+      const updateData = state.data.map((item) => {
+        if (item.id === action.payload.id) {
+          return { ...item, text: action.payload.text };
+        }
+        return item;
+      });
+      state.data = updateData;
+    },
+    addModel: (state, action) => {
+      console.log("model action",action)
+      const obj = {
+        id: uuidv4(),
+        url: action.payload.url,
+        scale:action.payload.scale,
+      };
+      state.modelData.push(obj);
     },
   },
 });
@@ -74,5 +99,7 @@ export const {
   setSelectedComponent,
   removeComponent,
   updateColor,
+  editText,
+  addModel,
 } = editorSlice.actions;
 export default editorSlice.reducer;
