@@ -5,6 +5,7 @@ import {
   addComponent,
   addModel,
   removeComponent,
+  removeModel,
   setMode,
   updateColor,
 } from "../Redux/editor.slice";
@@ -19,6 +20,7 @@ function Sidebar({ handleClick }) {
 
   const dispatch = useDispatch();
   const selectedComponents = useSelector((state) => state.selectedComponent);
+  const selectedModel =useSelector((state)=>state.selectedModel);
   const mode = useSelector((state) => state.mode);
   const data = useSelector((state) => state.data);
 
@@ -61,7 +63,7 @@ function Sidebar({ handleClick }) {
     text: "Hello",
     type: "text",
   };
-  
+
   const pickerStyle = {
     default: {
       picker: {
@@ -83,9 +85,10 @@ function Sidebar({ handleClick }) {
   };
 
   const modal = {
-    url:"./cover_chair.glb",
-    scale:0.5
-  }
+    url: "./cover_chair.glb",
+    scale: 0.5,
+    type:"model"
+  };
   const handleSelectChange = (event) => {
     setSelectedValue(event.target.value);
     dispatch(setMode(event?.target?.value));
@@ -134,7 +137,7 @@ function Sidebar({ handleClick }) {
 
         <li
           onClick={() => {
-            dispatch(addModel(modal));
+            dispatch(addComponent(modal));
           }}
         >
           Model
@@ -145,9 +148,10 @@ function Sidebar({ handleClick }) {
               dispatch(removeComponent(selectedComponents));
             }}
           >
-            Delete
+            Delete 
           </button>
         )}
+      
       </ul>
       {selectedComponents ? (
         <>

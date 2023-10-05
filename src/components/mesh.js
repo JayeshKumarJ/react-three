@@ -22,7 +22,8 @@ import Drunk from "./Drunk.js";
 import { useControls } from "leva";
 import { BlendFunction } from "postprocessing";
 import { Physics, RigidBody } from "@react-three/rapier";
-import { Perf } from 'r3f-perf'
+import { Perf } from "r3f-perf";
+import Modal from "./Modal";
 // import { GLTFExporter } from 'three/addons/loaders/GLTFExporter';
 
 const Meshes = forwardRef(function Component(props, ref) {
@@ -89,13 +90,13 @@ const Meshes = forwardRef(function Component(props, ref) {
     frequency: { value: 2, min: 1, max: 20 },
     amplitude: { value: 0.1, min: 0, max: 1 },
   });
-  
+
   const { perfVisible } = useControls({
-    perfVisible: true
-})
-const { envMapIntensity } = useControls('environment map', {
-  envMapIntensity: { value: 1, min: 0, max: 12 }
-})
+    perfVisible: true,
+  });
+  const { envMapIntensity } = useControls("environment map", {
+    envMapIntensity: { value: 1, min: 0, max: 12 },
+  });
   const handleChange = (event) => {
     // 👇 Get input value from "event"
     setText(event.target.value);
@@ -109,9 +110,10 @@ const { envMapIntensity } = useControls('environment map', {
       "condition",
       components?.selectedComponent?.sceneObj?.uuid === component?.id
     );
+
     return (
       <>
-      {perfVisible && <Perf position="bottom-right"/>}
+        {perfVisible && <Perf position="bottom-right" />}
         {component?.type === "text" ? (
           <Selection>
             <EffectComposer multisampling={8} autoClear={false}>
@@ -131,7 +133,7 @@ const { envMapIntensity } = useControls('environment map', {
               component.id ? (
                 <Html
                   // position={[-4.7, 2.9, 0]}
-                  position={component.position}
+                  position={component?.position}
                 >
                   {isEdit ? (
                     <>
@@ -189,15 +191,6 @@ const { envMapIntensity } = useControls('environment map', {
                   {component?.text}
                   <meshNormalMaterial />
                 </Text3D>
-
-                {/* <Text
-                  scale={[10, 10, 10]}
-                  color="pink" // default
-                  anchorX="center" // default
-                  anchorY="middle" // default
-                >
-                  HELLO WORLD
-                </Text> */}
               </mesh>
             </Select>
           </Selection>
@@ -232,29 +225,31 @@ const { envMapIntensity } = useControls('environment map', {
                   // restitution={component?.type === "plane" ? 0 : null}
                   // friction={component?.type === "plane" ? 0.7 : null}
                 >
-                  <mesh 
-                    position={component?.position}
-                    rotation={component?.rotation}
-                    onClick={(e) => {
-                      console.log("event", e);
-                      dispatch(setMode("translate"));
-                      dispatch(
-                        setSelectedComponent({
-                          sceneObj: e.eventObject,
-                          addedObj: component,
-                        })
-                      );
-                    }}
-                  >
-                    <component.geometry
-                      args={component?.scale}
-                    />
-                    <component.material
-                    envMapIntensity={ envMapIntensity }
-                      color={`${component?.color}`}
-                      toneMapped={false}
-                    />
-                  </mesh>
+                  {component?.type === "model" ? (
+                    <Modal object={component} />
+                  ) : (
+                    <mesh
+                      position={component?.position}
+                      rotation={component?.rotation}
+                      onClick={(e) => {
+                        console.log("event", e);
+                        dispatch(setMode("translate"));
+                        dispatch(
+                          setSelectedComponent({
+                            sceneObj: e.eventObject,
+                            addedObj: component,
+                          })
+                        );
+                      }}
+                    >
+                      <component.geometry args={component?.scale} />
+                      <component.material
+                        envMapIntensity={envMapIntensity}
+                        color={`${component?.color}`}
+                        toneMapped={false}
+                      />
+                    </mesh>
+                  )}
                 </RigidBody>
                 {/* <RigidBody type="dynamic">  
                   <mesh position={[0, 4, 0]}>

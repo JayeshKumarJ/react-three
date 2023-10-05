@@ -7,10 +7,16 @@ import {
   Select,
   Selection,
 } from "@react-three/postprocessing";
+import { setMode, setSelectedComponent, setSelectedModel } from "../Redux/editor.slice";
 
 const Modal = function ({ object }) {
-  const model = useLoader(GLTFLoader, object.url);
-  console.log(model, "here");
+  const model = useLoader(GLTFLoader, object?.url);
+  const dispatch = useDispatch();
+  console.log("objectDetails:",object)
+  // console.log(model, "here");
+const selectedModel = useSelector((state)=>state.selectedComponent);
+console.log("Selected Model",selectedModel)
+console.log("condition:::",selectedModel?.sceneObj?.uuid === object.id)
   return (
     <>
       <Selection>
@@ -22,9 +28,19 @@ const Modal = function ({ object }) {
             width={2500}
           />
         </EffectComposer>
-        <Select enabled={true}>
-          <group onClick={()=>{console.log("clicked")}}>
-            <primitive object={model?.scene} scale={0.02} />
+        <Select enabled={selectedModel?.sceneObj?.uuid === object.id}>
+          <group
+            onClick={(e) => {
+              dispatch(setMode("translate"));
+              dispatch(
+                setSelectedComponent({
+                  sceneObj: e.eventObject,
+                  addedObj: object,
+                })
+              );
+            }}
+          >
+            <primitive object={model?.scene} scale={0.01} />
           </group>
         </Select>
       </Selection>

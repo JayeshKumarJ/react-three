@@ -14,6 +14,7 @@ import Models from "./model";
 const Scene = forwardRef(function Component(props, ref) {
   const mode = useSelector((state) => state.mode);
   const selectedComponent = useSelector((state) => state.selectedComponent);
+  const selectedModel = useSelector((state)=>state.selectedModel);
   const { scene } = useThree();
   console.log("tipan");
 
@@ -22,7 +23,7 @@ const Scene = forwardRef(function Component(props, ref) {
       <ambientLight intensity={1} />
       <directionalLight color="#fffffff" position={[1, 1, 1]} />
       <Meshes ref={ref} />
-      <Models />
+      {/* <Models /> */}
       <OrbitControls makeDefault />
       <TransformControls
         mode={mode}
