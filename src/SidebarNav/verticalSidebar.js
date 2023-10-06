@@ -12,17 +12,25 @@ import {
 import { SketchPicker } from "react-color";
 import { useThree } from "@react-three/fiber";
 import { GLTFExporter } from "three/addons/exporters/GLTFExporter.js";
+import ImageTexturePanel from "../components/ImageTexturePanel";
 
 function Sidebar({ handleClick }) {
   const [show, setShow] = useState(false);
   const [color, setColor] = useState("lightblue");
   const [selectedValue, setSelectedValue] = useState("translate");
+  const [isOpen, setIsOpen] = useState(false);
 
   const dispatch = useDispatch();
   const selectedComponents = useSelector((state) => state.selectedComponent);
-  const selectedModel =useSelector((state)=>state.selectedModel);
+  const selectedModel = useSelector((state) => state.selectedModel);
   const mode = useSelector((state) => state.mode);
   const data = useSelector((state) => state.data);
+
+  // Function to toggle the panel's visibility
+  const togglePanel = () => {
+    setIsOpen(!isOpen);
+  };
+
 
   console.log("selectedComponent1", selectedComponents);
   console.log("updated data", data);
@@ -86,8 +94,9 @@ function Sidebar({ handleClick }) {
 
   const modal = {
     url: "./cover_chair.glb",
+    // url:"./animated_model.glb",
     scale: 0.5,
-    type:"model"
+    type: "model",
   };
   const handleSelectChange = (event) => {
     setSelectedValue(event.target.value);
@@ -142,16 +151,19 @@ function Sidebar({ handleClick }) {
         >
           Model
         </li>
+        <button onClick={togglePanel} className="toggle-button">
+        Toggle Panel
+      </button>
         {selectedComponents === undefined ? null : (
           <button
             onClick={(e) => {
               dispatch(removeComponent(selectedComponents));
             }}
           >
-            Delete 
+            Delete
           </button>
+          
         )}
-      
       </ul>
       {selectedComponents ? (
         <>
@@ -177,6 +189,7 @@ function Sidebar({ handleClick }) {
       >
         {show ? "Close Color Picker" : "Open Color Picker"}
       </button>
+      {isOpen ? (<ImageTexturePanel isOpen={isOpen}/>) :null}
       {show ? (
         <SketchPicker
           styles={pickerStyle}

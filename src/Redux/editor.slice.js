@@ -9,7 +9,7 @@ export const editorSlice = createSlice({
     selectedComponent: undefined,
     color: "red",
     modelData: [],
-    selectedModel:undefined,
+    selectedModel: undefined,
   },
   reducers: {
     addComponent: (state, action) => {
@@ -26,7 +26,8 @@ export const editorSlice = createSlice({
         text: action.payload.text,
         type: action.payload.type,
         rotation: action.payload.rotation,
-        url:action.payload.url,
+        url: action.payload.url,
+        texture: action.payload.texture,
       };
 
       state.data.push(obj);
@@ -41,7 +42,7 @@ export const editorSlice = createSlice({
       state.selectedComponent = action.payload;
       const updatedData = state.data.map((item) => {
         if (item.id === action.payload.addedObj.id) {
-          console.log("inin")
+          console.log("inin");
           return { ...item, id: action.payload.sceneObj.uuid };
         }
         return item;
@@ -84,42 +85,16 @@ export const editorSlice = createSlice({
       });
       state.data = updateData;
     },
-    addModel: (state, action) => {
-      console.log("model action",action)
-      const obj = {
-        id: uuidv4(),
-        url: action.payload.url,
-        scale:action.payload.scale,
-        type:"model"
-      };
-      state.modelData.push(obj);
-    },
-    removeModel:(state,action)=>{
-      console.log("model action", action);
-      const i = state.modelData.findIndex(
-        (item) => item.id === action.payload.addedObj
-      );
-      // console.log("index", i);
-      if (i !== -1) {
-        state.modelData.splice(i, 1);
-      }
-      if (i === 0) {
-        state.selectedModel = undefined;
-      }
-    },
-    setSelectedModel: (state, action) => {
-      console.log("action obj", action.payload);
-      // console.log("idididid",action.payload.sceneObj.geometry.uuid )
-      state.selectedModel = action.payload;
-      const updatedData = state.modelData.map((item) => {
-        if (item.id === action.payload.addedObj) {
-          return { ...item, id: action.payload.sceneObj.uuid };
+    updateTexture: (state, action) => {
+      console.log("action in texture",action)
+      const updatedData = state.data.map((item) => {
+        if (item.id === action.payload.selectedComponents.id) {
+          return { ...item, texture: action.payload.texture };
         }
         return item;
       });
-      state.modelData = updatedData;
+      state.data = updatedData;
     },
-
   },
 });
 
@@ -130,8 +105,6 @@ export const {
   removeComponent,
   updateColor,
   editText,
-  addModel,
-  removeModel,
-  setSelectedModel,
+  updateTexture,
 } = editorSlice.actions;
 export default editorSlice.reducer;

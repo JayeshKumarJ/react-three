@@ -43,7 +43,6 @@ function App() {
         }}
         onCreated={created}
       >
-      {/* <color args={ [ 'ivory' ] } attach="background" />   */}
         <Scene ref={ref} />
       </Canvas>
       <Sidebar handleClick={handleClick} />

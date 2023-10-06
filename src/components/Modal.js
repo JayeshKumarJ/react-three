@@ -7,16 +7,34 @@ import {
   Select,
   Selection,
 } from "@react-three/postprocessing";
-import { setMode, setSelectedComponent, setSelectedModel } from "../Redux/editor.slice";
+import {
+  setMode,
+  setSelectedComponent,
+  setSelectedModel,
+} from "../Redux/editor.slice";
+import { setupModel } from "./animateSetup";
+import { useEffect } from "react";
+import { TextureLoader } from 'three/src/loaders/TextureLoader'
+
 
 const Modal = function ({ object }) {
   const model = useLoader(GLTFLoader, object?.url);
+
+  console.log("model=>>>>", model);
+
+  useEffect(() => {
+    if (model && model?.animations?.length) {
+      console.log("in useEffect");
+      setupModel(model);
+    }
+  }, []);
+  // const model = setupModel(_model);
   const dispatch = useDispatch();
-  console.log("objectDetails:",object)
+  console.log("objectDetails:", object);
   // console.log(model, "here");
-const selectedModel = useSelector((state)=>state.selectedComponent);
-console.log("Selected Model",selectedModel)
-console.log("condition:::",selectedModel?.sceneObj?.uuid === object.id)
+  const selectedModel = useSelector((state) => state.selectedComponent);
+  console.log("Selected Model", selectedModel);
+  console.log("condition:::", selectedModel?.sceneObj?.uuid === object.id);
   return (
     <>
       <Selection>

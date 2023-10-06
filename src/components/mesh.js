@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import { editText, setMode, setSelectedComponent } from "../Redux/editor.slice";
-import { useThree } from "@react-three/fiber";
+import { useLoader, useThree } from "@react-three/fiber";
 import { GLTFExporter } from "three/addons/exporters/GLTFExporter.js";
 import {
   useEffect,
@@ -24,7 +24,9 @@ import { BlendFunction } from "postprocessing";
 import { Physics, RigidBody } from "@react-three/rapier";
 import { Perf } from "r3f-perf";
 import Modal from "./Modal";
+import { AdditiveBlending } from "three";
 // import { GLTFExporter } from 'three/addons/loaders/GLTFExporter';
+import { TextureLoader } from 'three/src/loaders/TextureLoader'
 
 const Meshes = forwardRef(function Component(props, ref) {
   const [text, setText] = useState();
@@ -34,11 +36,15 @@ const Meshes = forwardRef(function Component(props, ref) {
   const components = useSelector((state) => state);
   const scene = useThree((state) => state.scene);
   const drunkRef = useRef();
+
+  const colorMap = useLoader(TextureLoader, `${components?.selectedComponent?.addedObj?.texture ? components?.selectedComponent?.addedObj?.texture:"./image1.png"}`)
+
   console.log("box", components?.data);
   console.log(
     "selected",
     components?.selectedComponent?.sceneObj?.geometry?.uuid
   );
+  console.log("new Component",components)
   console.log("Scene =>", scene);
   console.log("prevText", prevText);
   useImperativeHandle(
@@ -228,6 +234,7 @@ const Meshes = forwardRef(function Component(props, ref) {
                   {component?.type === "model" ? (
                     <Modal object={component} />
                   ) : (
+                    <>
                     <mesh
                       position={component?.position}
                       rotation={component?.rotation}
@@ -247,8 +254,14 @@ const Meshes = forwardRef(function Component(props, ref) {
                         envMapIntensity={envMapIntensity}
                         color={`${component?.color}`}
                         toneMapped={false}
+                        map={colorMap}
                       />
                     </mesh>
+                    {/* <points>
+                    <sphereGeometry args={[1,32,32]} attach="geometry"/>
+                    <pointsMaterial sizeAttenuation={true} size={[0.1]} blending={AdditiveBlending} transparent={true} />  
+                    </points> */}
+                    </>
                   )}
                 </RigidBody>
                 {/* <RigidBody type="dynamic">  
